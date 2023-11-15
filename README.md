@@ -3,7 +3,7 @@ Accurate interpretation of visual data for relevant information forms an importa
 ![Local Image](demo/masking-process.png)
 
 # Preprint and Citation
-This repository contains codes for our paper titled "Visual Attention Guided Learning "Visual Attention Guided Learning 
+This repository contains codes for our paper titled "Visual Attention Guided Learning 
 with Incomplete Labels for Seismic Fault Interpretation". The manuscript is currently undergoing review at IEEE TGRS. 
 The preprint of an earlier version of the manuscript may be accessed at https://eartharxiv.org/repository/view/5558/.
 

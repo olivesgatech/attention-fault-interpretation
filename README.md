@@ -23,8 +23,8 @@ below:
 A `requirements.txt` file is provided along with the other files in the repository. After installing anaconda, create
 a new environment called `fault_interpretation`. Thereafter, install the various dependencies as described below:
 ```commandline
-$ git clone 
-$ cd 
+$ git clone https://github.com/olivesgatech/attention-fault-interpretation.git
+$ cd attention-fault-interpretation
 $ conda create --name fault_interpretation --file requirements.txt
 $ conda activate fault_interpretation
 ```

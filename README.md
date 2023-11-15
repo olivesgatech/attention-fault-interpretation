@@ -80,4 +80,4 @@ keep the volume undecimated during inference.
 
 # Questions
 For any questions or concerns, please reach out to the corresponding author Ahmad Mustafa at ahmadmustafa.am@gmail.com.
-Alternatively, you may also open a pull request and we will follow up on it. 
+Alternatively, you may also open an issue and we will follow up on it. 

@@ -111,13 +111,8 @@ class SeismicForwardMC(Dataset):
                           ht=self.Win[0], hxl=self.Win[1], hil=self.Win[2],
                           decimate=self.decimate)
 
-        hilb = signal.hilbert(image)
-        
-        image = np.concatenate(
-            (image[np.newaxis, ...], np.imag(hilb)[np.newaxis, ...], np.abs(hilb)[np.newaxis, ...]), axis=0)
-
         if self.toTensor:
-            image = torch.from_numpy(image).float()
+            image = torch.from_numpy(image[np.newaxis, ...]).float()
 
         return {'image': image, 'Ind': I}
     
@@ -145,14 +140,9 @@ class SeismicFinetuneMC(Dataset):
         pad_h, pad_w, pad_d = self.win_size - cube.shape[0], self.win_size - cube.shape[2], self.win_size - cube.shape[1]
         cube = np.pad(cube, ((0,pad_h),(0,pad_d),(0,pad_w)), 'constant')
         label = np.pad(label, ((0,pad_h),(0,pad_d),(0,pad_w)), 'constant')
-        
-        # hilbert transform
-        hilb = signal.hilbert(cube)
-        seismic_tensor = np.concatenate((cube[np.newaxis,...], np.imag(hilb)[np.newaxis,...], np.abs(hilb)[np.newaxis,...]), axis=0)
-        label_tensor = label
 
-        seismic_tensor = torch.from_numpy(seismic_tensor).float().cuda()
-        label_tensor = torch.from_numpy(label_tensor).float().cuda()
+        seismic_tensor = torch.from_numpy(cube[np.newaxis,...]).float().cuda()
+        label_tensor = torch.from_numpy(label).float().cuda()
         
         return seismic_tensor, label_tensor
             
@@ -179,14 +169,9 @@ class SeismicIntelligentFinetuneMC(Dataset):
         pad_h, pad_w, pad_d = self.win_size - cube.shape[0], self.win_size - cube.shape[2], self.win_size - cube.shape[1]
         cube = np.pad(cube, ((0,pad_h),(0,pad_d),(0,pad_w)), 'constant')
         label = np.pad(label, ((0,pad_h),(0,pad_d),(0,pad_w)), 'constant')
-        
-        # hilbert transform
-        hilb = signal.hilbert(cube)
-        seismic_tensor = np.concatenate((cube[np.newaxis,...], np.imag(hilb)[np.newaxis,...], np.abs(hilb)[np.newaxis,...]), axis=0)
-        label_tensor = label
-        
-        seismic_tensor = torch.from_numpy(seismic_tensor).float().cuda()
-        label_tensor = torch.from_numpy(label_tensor).float().cuda()
+
+        seismic_tensor = torch.from_numpy(cube[np.newaxis,...]).float().cuda()
+        label_tensor = torch.from_numpy(label).float().cuda()
         
         return seismic_tensor, label_tensor
         

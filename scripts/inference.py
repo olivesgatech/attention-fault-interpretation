@@ -9,8 +9,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
-from networks.unet3D import UNet3D
-from dataloaders import SeismicForwardMC
+# from core.networks import UNet3D
+# from core.dataloaders import SeismicForwardMC
 import argparse
 import os
 from os.path import join

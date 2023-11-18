@@ -8,8 +8,8 @@ Created on Wed Jun  1 09:14:11 2022
 import torch 
 import torch.nn as nn
 import numpy as np
-from networks.unet3D import UNet3D
-from dataloaders import SeismicFinetuneMC, gen_dist_mask, SeismicIntelligentFinetuneMC
+from core.networks import UNet3D
+from core.dataloaders import gen_dist_mask, SeismicIntelligentFinetuneMC
 from torch.utils.data import DataLoader
 import argparse
 

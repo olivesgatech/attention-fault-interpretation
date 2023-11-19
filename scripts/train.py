@@ -4,7 +4,6 @@ Created on Wed Jun  1 09:14:11 2022
 
 @author: mustaah
 """
-
 import torch 
 import torch.nn as nn
 import numpy as np
@@ -44,8 +43,8 @@ win_size = args['window']
 
 # import model and load state dict
 model = UNet3D().cuda()
+model.load_state_dict(torch.load(args['model'])['model'])
 model = nn.DataParallel(model)  # for multi-gpu training
-model.load_state_dict(torch.load(args['model']))
 
 # data paths
 datapath = args['input']

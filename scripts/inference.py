@@ -9,8 +9,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
-# from core.networks import UNet3D
-# from core.dataloaders import SeismicForwardMC
+from core.networks import UNet3D
+from core.dataloaders import SeismicForwardMC
 import argparse
 import os
 from os.path import join
@@ -38,8 +38,8 @@ args = vars(ap.parse_args())
 
 # import model and load state dict
 model = UNet3D().cuda()
+model.load_state_dict(torch.load(args['model'])['model'])
 model = nn.DataParallel(model)  # for multi-gpu inference
-model.load_state_dict(torch.load(args['model']))
 
 # load preprocess data
 seismic = np.load(args['input']).astype(np.float32)
@@ -51,7 +51,7 @@ if args['decimate']=="True":
 else:
     pass
 
-seismic = np.clip(seismic, -2*seismic.std(), 2*seismic.std())
+seismic = np.clip(seismic, -3*seismic.std(), 3*seismic.std())
 seismic = (seismic - seismic.mean())/seismic.std()
 
 # inference

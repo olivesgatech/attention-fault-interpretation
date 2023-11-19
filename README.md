@@ -1,4 +1,3 @@
-![fault_img](demo/pretrained_pred.png)
 # Introduction
 Accurate interpretation of visual data for relevant information forms an important component of many real-world applications such as medical disease diagnosis, geological hazard assessment, hydrocarbon exploration, etc. Producing fine-grained annotations on images is an expensive, laborious, and time-consuming process. The human brain is wired to selectively focus its attention on certain aspects of the visual scene. This perception mechanism is driven both by low-level signal cues, such as changes in color, contrast, intensity, shapes etc., as well as high-level cognitive factors such as one’s prior knowledge, goals, expectations, and constraints with respect to the task at hand. These attentional factors, referred to as bottom-up and top-down attention respectively, play an important role in determining the final annotations that get produced for a given visual scene, often at the cost of leaving out a lot of visual information the brain deems to be unimportant with regard to the task of interest. Mapping geological faults on 3D seismic volumes is one such application where human attention selectivity results in highly incomplete fault annotations. Conventional supervised learning methods treat regions of missed fault labels as negatives, resulting in non-optimal learning for the machine learning model. We propose a method to model visual attention and incorporate it into data sampling and model training procedures. We demonstrate the utility of this approach for mapping faults on seismic volumes using pretrained 3D convolutional neural networks (CNNs). Using an annotated seismic dataset from NW Australia, we show quantitatively and qualitatively that modeling visual attention leads to significant performance gains even with limited, incompletely labeled seismic training data.
 ![Local Image](demo/masking-process.png)
@@ -32,7 +31,16 @@ $ conda activate fault_interpretation
 To install PyTorch, please refer to the instructions described on the official PyTorch website [here](https://pytorch.org/get-started/locally/).
 
 # Model Pretraining
+This step assumes you are not starting with an already pretrained model. If you have one of your own or you would like to use the one that we provide with this repository, feel free to move to the next step. You need to download the synthetic training data consisting of seismic cubes and their corresponding fault models as developed by the paper [here](https://github.com/xinwucwp/faultSeg). As of now, their training data is available [here](https://drive.google.com/drive/folders/1N4OQk0BDTRTisbJ4rSRlUoEGD0MdzrSg). Set up the training data directories so that all of the seismic cubes are contained in one folder and all of their corresponding fault label cubes are stored in a different folder. Afterwards, you may start the pretraining process by running the following commands in a terminal:
+```commandline
+$ cd scripts
+$ python pretrain.py -s <path/to/seismic/folder> -f <path/to/fault/folder>
+```
+You should be able to visualize the training as it progresses. The script has been set up to run for 500 epochs but you may choose to stop early by stopping the execution and obtain the model trained at that point. It will be a good idea to test that your pretrained model actually works on data outside of the training distribution. We provide an ipython notebook showing the application of the model to a seismic volume from the F3 block, Netherlands. A view of a sample depth slice along with the fault predictions can be seen in the image below:
 
+![fault_img](demo/pretrained_pred.png)
+
+At this point, you are ready to move to the next step. 
 
 # Downloading the Data
 The seismic dataset from NW Australia and its fault annotations used in the paper may be obtained [here](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/YBYGBK).

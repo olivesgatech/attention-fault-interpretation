@@ -38,8 +38,9 @@ args = vars(ap.parse_args())
 
 # import model and load state dict
 model = UNet3D().cuda()
-model.load_state_dict(torch.load(args['model'])['model'])
 model = nn.DataParallel(model)  # for multi-gpu inference
+model.load_state_dict(torch.load(args['model'])['model'])
+
 
 # load preprocess data
 seismic = np.load(args['input']).astype(np.float32)

@@ -9,6 +9,7 @@ import torch.nn as nn
 import numpy as np
 from core.networks import UNet3D
 from core.dataloaders import gen_dist_mask, SeismicIntelligentFinetuneMC
+from core.utils import save_checkpoint
 from torch.utils.data import DataLoader
 import argparse
 
@@ -31,6 +32,8 @@ ap.add_argument('-w', '--window', type=int, required=False, default=128,
                 help='[int] Window size')
 ap.add_argument('-n', '--num_samples', type=int, required=False, default=100,
                 help='[int] Number of cubes to be stochastically sampled in the vicinity of annotated faults each iteration')
+ap.add_argument('-j', '--indices', type=int, nargs='+', required=True,
+                help='indices of sections to be used for finetuning')
 ap.add_argument('-e', '--epochs', type=int, required=False, default=20, 
                 help='Number of finetuning epochs')
 args = vars(ap.parse_args())
@@ -43,8 +46,8 @@ win_size = args['window']
 
 # import model and load state dict
 model = UNet3D().cuda()
-model.load_state_dict(torch.load(args['model'])['model'])
 model = nn.DataParallel(model)  # for multi-gpu training
+model.load_state_dict(torch.load(args['model'])['model'])
 
 # data paths
 datapath = args['input']
@@ -78,24 +81,33 @@ dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
 # loss function
-loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([100]).float().cuda(), reduction='none')
+loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([25]).float().cuda(), reduction='none')
 
 # finetune loop
-for epoch in range(epochs):
-    for i, (cube_data, cube_labels) in enumerate(dataloader):
-        model.train()
-        optimizer.zero_grad()
-        pred_labels = model(cube_data).squeeze(1)
+try:
+    for epoch in range(epochs):
+        for i, (cube_data, cube_labels) in enumerate(dataloader):
+            model.train()
+            optimizer.zero_grad()
+            pred_labels = model(cube_data).squeeze(1)
 
-        # weight loss tensor pixels by the attention map
-        mask = gen_dist_mask(cube_labels[:,:,0,:].detach().cpu().numpy())
-        loss = loss_fn(pred_labels, cube_labels)[:,:,0,:] * mask
-        loss = loss.sum() / (win_size**2)
+            # weight loss tensor pixels by the attention map
+            mask = gen_dist_mask(cube_labels[:,:,0,:].detach().cpu().numpy())
+            loss = loss_fn(pred_labels, cube_labels)[:,:,0,:] * mask
+            loss = loss.sum() / (win_size**2)
 
-        loss.backward()
-        optimizer.step()
-        print('Epoch: {} | Iter: {} | Train Loss: {:0.4f}'.format(epoch, i, loss.item()))
+            loss.backward()
+            optimizer.step()
+            print('Epoch: {} | Iter: {} | Train Loss: {:0.4f}'.format(epoch, i, loss.item()))
 
-    if epoch % 10 == 0:  # save model every 10 epochs
-        save_path = args['output']
-        torch.save(model.state_dict(), save_path)
+        if epoch % 10 == 0:  # save model every 10 epochs
+            save_path = args['output']
+            save_checkpoint(model, optimizer, epoch, args['output'])
+
+except KeyboardInterrupt:
+    print('Code Interrupted. Checkpointing...')
+    save_checkpoint(model, optimizer, epoch, args['output'])
+    print('Checkpointing Completed. Now exiting')
+
+# save checkpoint once training completes
+save_checkpoint(model, optimizer, epoch, args['model'])

@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 import os
 import numpy as np
-#from scipy import signal
+from scipy import signal
 
 
 def gen_dist_mask(fault_image, smoothing=0.01, emphasis=10):
